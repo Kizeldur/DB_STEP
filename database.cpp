@@ -1,6 +1,7 @@
 #include "database.h"
 #include <vector>
 
+
 using namespace std;
 
 DataBase::DataBase()
@@ -19,14 +20,18 @@ void DataBase::Open(){
     db.open();
 }
 
+void DataBase::Open_2(Ui_MainWindow *ui){
+    if(db.open()){
+        ui->statusbar->showMessage("Cool");
+    } else {
+         ui->statusbar->showMessage("Not Coll");
+    }
+}
+
 void DataBase::Close(){
     db.close();
 }
-/*Р’СЃРµ С„СѓРЅРєС†РёРё СѓРЅРёРІРµСЂСЃР°Р»СЊРЅС‹Рµ РґР»СЏ РІСЃРµС… С‚Р°Р±Р»РёС†, СЏ СЂРµС€РёР» РїСЂРѕРїРёСЃР°С‚СЊ РІ РЅРёС… РІСЃРµ РЅРµРѕР±С…РѕРґРёРјС‹Рµ РїСЂРѕРІРµСЂРєРё, РѕСЃС‚Р°РµС‚СЃСЏ С‚РѕР»СЊРєРѕ РїРµСЂРµРґР°С‚СЊ РЅСѓР¶РЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РґР°РЅРЅС‹С…*/
 
-/* Execute - СѓРЅРёРІРµСЂСЃР°Р»СЊРЅР°СЏ РІРѕР№РґРѕРІСЃРєР°СЏ С„СѓРЅРєС†РёСЏ РґР»СЏ РІС‹РїРѕР»РЅРµРЅРёСЏ Р»СЋР±С‹С… Р·Р°РїСЂРѕСЃРѕРІ. */
-/*РџРѕР»СѓС‡Р°РµС‚ РёРјСЏ С‚Р°Р±Р»РёС†С‹, С€Р°Р±Р»РѕРЅ СЃС‚СЂСѓРєС‚СѓСЂС‹ PersonTemplate СЃ РґР°РЅРЅС‹РјРё, СЃС‚СЂРѕРєСѓ СЃ Р·Р°РїСЂРѕСЃРѕРј Рё РёРјСЏ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРіРѕ СЃС‚РѕР»Р±С†Р° (РїСЂ. С„Р°РєСѓР»СЊС‚РµС‚), РµСЃР»Рё С‚Р°РєРѕРІРѕР№ РµСЃС‚СЊ.*/
-/*РњРѕР¶РµС‚ РЅРµ СЃСЂР°Р±РѕС‚Р°С‚СЊ РёР·-Р·Р° С‚РѕРіРѕ, С‡С‚Рѕ РІ СЂР°Р·РЅС‹С… Р·Р°РїСЂРѕСЃР°С… РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ СЂР°Р·РЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р·РЅР°С‡РµРЅРёР№, Рё РІ С„СѓРЅРєС†РёРё РёРґРµС‚ РїСЂРёРІСЏР·РєР° Р·РЅР°С‡РµРЅРёР№, РєР°РєРёС… РЅРµС‚ РІ Р·Р°РїСЂРѕСЃРµ, РІ С‚Р°РєРѕРј СЃР»СѓС‡Р°Рµ РјРЅРµ РїСЂРёРґРµС‚СЃСЏ РїРµСЂРµРїРёСЃР°С‚СЊ С„СѓРЅРєС†РёРё, РЅРѕ С‚Р°Рј РІРёРґРЅРѕ Р±СѓРґРµС‚*/
 int DataBase::Execute(QString tableName, PersonTemplate person, QString sql, QString valueName = "0"){
     valueName = ":" + valueName;
     QSqlQuery query;
@@ -41,49 +46,148 @@ int DataBase::Execute(QString tableName, PersonTemplate person, QString sql, QSt
         query.bindValue(valueName, person.otherData);
     }
     query.bindValue(":isActive", person.isActive);
-    query.exec();
-    return person.id;
+    /*query.exec();
+    return person.id;*/
+    if(query.exec()){
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+int DataBase::Execute_2(Ui_MainWindow *ui, QString tableName, PersonTemplate person, QString sql, QString valueName = "0"){
+    valueName = ":" + valueName;
+    QSqlQuery query;
+    query.prepare(sql);
+    query.bindValue(":tableName", tableName);
+    query.bindValue(":id", person.id);
+    query.bindValue(":lastName", person.lastName);
+    query.bindValue(":name", person.name);
+    query.bindValue(":patronymic", person.patronym);
+    query.bindValue(":dateOfBirth", person.dateOfBirth);
+    if(person.otherData != "0") {
+        query.bindValue(valueName, person.otherData);
+    }
+    query.bindValue(":isActive", person.isActive);
+    int flag = query.exec();
+    return flag;
+    /*
+    if(query.exec()){
+        ui->statusbar->showMessage("Cool Exec");
+    } else {
+        ui->statusbar->showMessage( " Didn't work - " + sql);
+    }*/
 }
 
 void DataBase::Insert(QString tableName, QString name, QString lastName, QString patronym, QString dateOfBirth, QString otherData = "0", QString valueName = "0"){
     PersonTemplate person(lastName, name, patronym, dateOfBirth, 1, otherData);
-    QString sql = GiveMeInsertString(valueName);
-    DataBase::Execute(tableName, person, sql, valueName);
+    QString sql = GiveMeInsertString(tableName, valueName);
+    Execute(tableName, person, sql, valueName);
 }
 
 
+// Done
+int DataBase::Insert_2(Ui_MainWindow *ui, QString tableName, QString name, QString lastName, QString patronym, QString dateOfBirth, QString otherData = "0", QString valueName = "0"){
+    PersonTemplate person(lastName, name, patronym, dateOfBirth, 1, otherData);
+    QString sql = GiveMeInsertString(tableName, valueName);
+    return Execute_2(ui,tableName, person, sql, valueName);
+}
+
+
+//Done
 void DataBase::Edit(QString tableName, int id, QString name, QString lastName, QString patronym, QString dateOfBirth, QString otherData = "0", QString valueName = "0"){
     PersonTemplate person(lastName, name, patronym, dateOfBirth, 1, otherData, id);
-    QString sql = GiveMeUpdateString(valueName);
-    DataBase::Execute(tableName, person, sql, valueName);
+    QString sql = GiveMeUpdateString(tableName, valueName);
+    Execute(tableName, person, sql, valueName);
 }
+
+int DataBase::Edit_2(Ui_MainWindow *ui, QString tableName, int id, QString name, QString lastName, QString patronym, QString dateOfBirth, QString otherData = "0", QString valueName = "0"){
+    PersonTemplate person(lastName, name, patronym, dateOfBirth, 1, otherData, id);
+    QString sql = GiveMeUpdateString(tableName, valueName);
+    valueName = ":" + valueName;
+    QSqlQuery query;
+    query.prepare(sql);
+    query.bindValue(":id", person.id);
+    query.bindValue(":lastName", person.lastName);
+    query.bindValue(":name", person.name);
+    query.bindValue(":patronym", person.patronym);
+    query.bindValue(":dateOfBirth", person.dateOfBirth);
+    if(person.otherData != "0") {
+        query.bindValue(valueName, person.otherData);
+    }
+    query.bindValue(":isActive", 1);
+    return query.exec();
+    
+    if(query.exec()){
+        ui->statusbar->showMessage("Cool Exec");
+    } else {
+        ui->statusbar->showMessage( " Didn't work - " + sql);
+    }
+}
+
 
 
 void DataBase::Delete(QString tableName, int id){
 
     PersonTemplate person("Какое-то", "Дерьмо", "Чтобы", "Занять", 0, "Место", id);
-    QString sql = GiveMeDeleteString();
-    DataBase::Execute(tableName, person, sql);
+    QString sql = GiveMeDeleteString(tableName);
+    Execute(tableName, person, sql);
 }
+
+int DataBase::Delete_2(Ui_MainWindow *ui, QString tableName, int id){
+
+    PersonTemplate person("Какое-то", "Дерьмо", "Чтобы", "Занять", 0, "Место", id);
+    QString sql = GiveMeDeleteString(tableName);
+    QSqlQuery query;
+    query.prepare(sql);
+    query.bindValue(":id", id);
+    return query.exec();
+    /*if(query.exec()){
+        ui->statusbar->showMessage("Cool Exec");
+    } else {
+        ui->statusbar->showMessage( " Didn't work - " + sql);
+    }*/
+}
+
+
 
 int DataBase::GiveMeId(QString tableName, QString lastName, QString name = "0"){
   PersonTemplate person(lastName, name, "Чтобы", "Занять", 0, "Место");
-  auto sql = GiveMeIdString(name);
-  person.id = DataBase::Execute(tableName, person, sql);
+  auto sql = GiveMeIdString(tableName, name);
+  person.id = Execute(tableName, person, sql);
   return person.id;
 }
-/*
+
+
+//Done, redo name value
+int DataBase::GiveMeId_2(Ui_MainWindow *ui, QString tableName, QString lastName, QString name = "0"){
+  PersonTemplate person(lastName, name, "Чтобы", "Занять", 0, "Место");
+  auto sql = GiveMeIdString(tableName, name);
+  QSqlQuery query;
+  query.prepare(sql);
+  query.bindValue(":lastName", lastName);
+  query.bindValue(":name", name);
+  query.exec();
+  if(query.next()){
+      person.id = query.value(0).toInt();
+        return person.id;
+  } else {
+      return -1;
+  }
+}
+
+//  количество строк
 PersonTemplate DataBase::Search(QString tableName, int id){
     PersonTemplate person;
-    auto sql = GiveMeSearchString();
-
+    auto sql = GiveMeSearchString(tableName);
     QSqlQuery query;
     query.prepare(sql);
-    query.bindValue(":tableName", tableName);
     query.bindValue(":id", id);
     query.exec();
-    int size = query.record().count();
-    person.id = query.value(0).ToInt();
+
+    //int size = query.record().count();
+    int size = 7;
+    person.id = query.value(0).toInt();
     person.lastName = query.value(1).toString();
     person.name = query.value(2).toString();
     person.patronym = query.value(3).toString();
@@ -93,16 +197,32 @@ PersonTemplate DataBase::Search(QString tableName, int id){
     person.isActive = query.value(size - 1).toInt();
     return person;
 }
-*/
 
-/*
-vector<PersonTemplate> GiveMeDB(){
-  vector<PersonTemplate> vectorDB;
 
-  PersonTemplate person;
-    for(int i=0; i < ){
+PersonTemplate DataBase::Search_2(Ui_MainWindow *ui, QString tableName, int id){
+    PersonTemplate person;
+    auto sql = GiveMeSearchString(tableName);
+    QSqlQuery query;
+    query.prepare(sql);
+    query.bindValue(":id", id);
+    query.exec();
 
+    //int size = query.record().count();
+    int size = 7;
+
+    if(query.next()){
+        person.id = query.value(0).toInt();
+        person.lastName = query.value(1).toString();
+        person.name = query.value(2).toString();
+        person.patronym = query.value(3).toString();
+        if(size > 6){
+            person.otherData = query.value(4).toString();
+        }
+        person.isActive = query.value(size - 1).toInt();
+        ui->statusbar->showMessage(person.lastName);
+        return person;
+
+    } else {
+        ui->statusbar->showMessage("None");
     }
-
 }
-*/
