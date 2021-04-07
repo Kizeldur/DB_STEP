@@ -1,5 +1,5 @@
 #pragma once
-//#include <QString>
+#include <QString>
 #include "PersonTemplate.h"
 
 QString GiveMeInsertString(QString tableName, QString valueName){
@@ -18,9 +18,9 @@ QString GiveMeInsertString(QString tableName, QString valueName){
   return sql;
 }
 
-QString GiveMeUpdateString(QString valueName){
-
-  QString sql = "UPDATE :tableName SET lastName = :lastName, name = :name, patronymic = :patronym, dateOfBirth = :dateOfBirth";
+QString GiveMeUpdateString(QString tableName, QString valueName){
+  QString sql = "UPDATE " + tableName;
+  sql += " SET lastName = :lastName, name = :name, patronymic = :patronym, dateOfBirth = :dateOfBirth";
   if(valueName != "0"){
       sql += ", " + valueName + " = :" + valueName;
   }
@@ -29,24 +29,24 @@ QString GiveMeUpdateString(QString valueName){
   return sql;
 }
 
-QString GiveMeDeleteString(){
-  QString sql = "UPDATE :tableName SET isActive = 0 ";
+QString GiveMeDeleteString(QString tableName){
+  QString sql = "UPDATE " + tableName;
+  sql += " SET isActive = 0";
   sql += " WHERE id = :id;";
   return sql;
 }
 
-QString GiveMeIdString(QString name){
-  QString sql = "SELECT id FROM tableName WHERE lastName = :lastName";
-  if(name != "0") {
+QString GiveMeIdString(QString tableName, QString name){
+  QString sql = "SELECT id FROM " + tableName + " WHERE lastName = :lastName";
+ /* if(name != "0") {
     sql += "AND name = :name";
-  }
+  }*/
   sql += ";";
 
   return sql;
 }
 
-QString GiveMeSearchString(){
-  QString sql = "SELECT * FROM :tableName WHERE id = :id;";
+QString GiveMeSearchString(QString tableName){
+  QString sql = "SELECT * FROM " + tableName + " WHERE id = :id;";
   return sql;
 }
-

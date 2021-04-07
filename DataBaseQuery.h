@@ -4,11 +4,10 @@
 
 QString GiveMeInsertString(QString tableName, QString valueName);
 
-QString GiveMeUpdateString(QString valueName);
+QString GiveMeUpdateString(QString tableName, QString valueName);
 
-QString GiveMeDeleteString();
+QString GiveMeDeleteString(QString tableName);
 
-QString GiveMeIdString(QString name);
+QString GiveMeIdString(QString tableName, QString name);
 
-QString GiveMeSearchString();
-
+QString GiveMeSearchString(QString tableName);
