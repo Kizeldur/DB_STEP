@@ -127,6 +127,7 @@ void MainWindow::on_Button_Clear_clicked()
 void MainWindow::on_Button_Export_S_clicked()
 {
     QString Input_Address_S;
+    QString tableName = "students";
     QFile File_Step (Input_Address_S);
 
     if(!File_Step.open(QFile::Append | QFile::Text)){
@@ -135,53 +136,65 @@ void MainWindow::on_Button_Export_S_clicked()
     }
 
     QTextStream stream(&File_Step);
-
-    stream  << ui->Input_Name->text() << ";"
-            << ui->Input_LastName->text()<< ";"
-            << ui->Input_Patronym->text()<< ";"
-            << ui->Input_Birthday->text()<< ";"
-            << ui->Input_Faculty->text() + "\n";
+    for (int i = 0; i < 7; i++) {
+      PersonTemplate person = db.Search_2(ui, tableName, i);
+      stream  << person.name << ";"
+              << person.lastName<< ";"
+              << ui->person.patronym<< ";"
+              << ui->person.dateOfBirth<< ";"
+              << ui->person.otherData->text() + "\n";
+    }
 
     File_Step.flush();
     File_Step.close();
 }
 void MainWindow::on_Button_Export_E_clicked()
 {
-    QString Input_Address_E;
-    QFile File_Step (Input_Address_E);
+  QString Input_Address_S;
+  QString tableName = "employee";
+  QFile File_Step (Input_Address_S);
 
-    if(!File_Step.open(QFile::Append | QFile::Text)){
-        QMessageBox ::information(this,"ERROR","No path corect");
-        return;
-    }
+  if(!File_Step.open(QFile::Append | QFile::Text)){
+      QMessageBox ::information(this,"ERROR","No path corect");
+      return;
+  }
 
-    QTextStream stream(&File_Step);
+  QTextStream stream(&File_Step);
+  for (int i = 0; i < 7; i++) {
+    PersonTemplate person = db.Search_2(ui, tableName, i);
+    stream  << person.name << ";"
+            << person.lastName<< ";"
+            << ui->person.patronym<< ";"
+            << ui->person.dateOfBirth<< ";"
+            << ui->person.otherData->text() + "\n";
+  }
 
-    stream
-            << ui->Input_Name->text() << ";"
-            << ui->Input_LastName->text()<< ";"
-            << ui->Input_Patronym->text()<< ";"
-            << ui->Input_Birthday->text()<< ";"
-            << ui->Input_Post->text() + "\n";
+  File_Step.flush();
+  File_Step.close();
 }
+
 void MainWindow::on_Button_Export_A_clicked()
 {
-    QString Input_Address_A;
-    QFile File_Step (Input_Address_A);
+  QString Input_Address_S;
+  QString tableName = "enrollee";
+  QFile File_Step (Input_Address_S);
 
-    if(!File_Step.open(QFile::Append | QFile::Text)){
-        QMessageBox ::information(this,"ERROR","No path corect");
-        return;
-    }
+  if(!File_Step.open(QFile::Append | QFile::Text)){
+      QMessageBox ::information(this,"ERROR","No path corect");
+      return;
+  }
 
-    QTextStream stream(&File_Step);
+  QTextStream stream(&File_Step);
+  for (int i = 0; i < 7; i++) {
+    PersonTemplate person = db.Search_2(ui, tableName, i);
+    stream  << person.name << ";"
+            << person.lastName<< ";"
+            << ui->person.patronym<< ";"
+            << ui->person.dateOfBirth<< ";\n";
+  }
 
-    stream
-            << ui->Input_Name->text() << ";"
-            << ui->Input_LastName->text()<< ";"
-            << ui->Input_Patronym->text()<< ";"
-            << ui->Input_Birthday->text()<< + "\n";
-
+  File_Step.flush();
+  File_Step.close();
 }
 
 void MainWindow::on_Button_Import_clicked()
@@ -201,20 +214,17 @@ if (!File_Step.open(QFile::ReadOnly | QFile::Text)){
           QStringList firstList = temp.split(tagExp);
           PersonTemplate p(firstList[1], firstList[0], firstList[2], firstList[3],1, firstList[4],-1);
         	if(ui->radioButton_Student->isChecked()){
-          		db.Insert_2(ui, "students", p.name, p.lastName, p.patronym, p.dateOfBirth, p.otherData, "faculty");
-			} else 
-			if(ui->radioButton_Employee->isChecked()){
-				db.Insert_2(ui, "employee", p.name, p.lastName, p.patronym, p.dateOfBirth, p.otherData, "position");
-			} else 
-			if(ui->radioButton_Enrollee->isChecked()){
-				db.Insert_2(ui, "enrollee", p.name, p.lastName, p.patronym, p.dateOfBirth, p.otherData, "0");
-			} 
+            db.Insert_2(ui, "students", p.name, p.lastName, p.patronym, p.dateOfBirth, p.otherData, "faculty");
+			    } else
+			    if(ui->radioButton_Employee->isChecked()){
+            db.Insert_2(ui, "employee", p.name, p.lastName, p.patronym, p.dateOfBirth, p.otherData, "position");
+			    } else
+          if(ui->radioButton_Enrollee->isChecked()){
+            db.Insert_2(ui, "enrollee", p.name, p.lastName, p.patronym, p.dateOfBirth, p.otherData, "0");
+			    }
         }
 
         File_Step.flush();
         File_Step.close();
 
 }
-
-
-
