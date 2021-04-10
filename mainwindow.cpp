@@ -123,6 +123,46 @@ void MainWindow::on_Button_Clear_clicked()
 //
 //
 //}
+void MainWindow::on_Button_Export_clicked()
+{
+    QString Input_Address;
+    QString tableNameж
+    if(ui->radioButton_Student->isChecked()){
+      tableName = "students";
+    } else
+    if(ui->radioButton_Employee->isChecked()){
+        tableName = "employee";
+    } else
+    if(ui->radioButton_Enrollee->isChecked()){
+      tableName = "enrollee";
+    }
+
+    QFile File_Step (Input_Address_S);
+
+    if(!File_Step.open(QFile::Append | QFile::Text)){
+        QMessageBox ::information(this,"ERROR","No path corect");
+        return;
+    }
+
+    QTextStream stream(&File_Step);
+    for (int i = 0; i < 7; i++) {
+      PersonTemplate person = db.Search_2(ui, tableName, i);
+      stream  << person.name << ";"
+              << person.lastName<< ";"
+              << ui->person.patronym<< ";"
+              << ui->person.dateOfBirth<< ";";
+
+              if(tableName != "enrollee"){
+                stream;  << ui->person.otherData->text();
+              }
+              stream << "\n";
+
+    }
+
+    File_Step.flush();
+    File_Step.close();
+}
+
 
 void MainWindow::on_Button_Export_S_clicked()
 {
@@ -148,6 +188,8 @@ void MainWindow::on_Button_Export_S_clicked()
     File_Step.flush();
     File_Step.close();
 }
+
+
 void MainWindow::on_Button_Export_E_clicked()
 {
   QString Input_Address_S;
